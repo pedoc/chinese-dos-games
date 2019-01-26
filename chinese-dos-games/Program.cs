@@ -11,6 +11,11 @@ namespace ChineseDosGames
 {
     class Program
     {
+        public const int MaxTaskCount = 10;
+
+
+        public static int TaskCount = 0;
+
         public static int DownloadCount = 0;
         public static float DownloadTotal = 0;
         static void Main(string[] args)
@@ -48,6 +53,12 @@ namespace ChineseDosGames
                         continue;
                     }
                 }
+
+                Interlocked.Add(ref TaskCount, 1);
+                while (TaskCount >= MaxTaskCount)
+                {
+                    Thread.Sleep(100);
+                }
                 //Console.WriteLine($"正在下载 {identifier}");
                 Downloader.Download(GetDownloadPath(identifier), targetFile, identifier, game, ++index, define);
             }
@@ -76,6 +87,7 @@ namespace ChineseDosGames
             {
                 Console.WriteLine($"{downloadItem.Identifier} 下载失败，详情：{e.Error?.Message}");
             }
+            Interlocked.Decrement(ref TaskCount);
         }
 
         public static void UpdateHash(string hash, JToken token, bool writeToFile,JObject root)
