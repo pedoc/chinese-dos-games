@@ -43,13 +43,13 @@ namespace ChineseDosGames
                 {
                     var hash = prop.Value["sha256"].ToObject<string>();
                     if (Sha256(File.OpenRead(targetFile)).Equals(hash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Interlocked.Add(ref DownloadCount, 1);
                         continue;
+                    }
                 }
-                else
-                {
-                    //Console.WriteLine($"正在下载 {identifier}");
-                    Downloader.Download(GetDownloadPath(identifier), targetFile, identifier, game, ++index, define);
-                }
+                //Console.WriteLine($"正在下载 {identifier}");
+                Downloader.Download(GetDownloadPath(identifier), targetFile, identifier, game, ++index, define);
             }
             Console.ReadKey();
         }
@@ -74,7 +74,7 @@ namespace ChineseDosGames
             }
             else
             {
-                Console.WriteLine($"{downloadItem.Identifier} 下载失败");
+                Console.WriteLine($"{downloadItem.Identifier} 下载失败，详情：{e.Error?.Message}");
             }
         }
 
